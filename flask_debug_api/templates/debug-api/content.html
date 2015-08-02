@@ -1,0 +1,26 @@
+<!doctype html>
+<body>
+
+{{ data }}
+
+{% if post %}
+<textarea rows="15" cols="70" id="data"></textarea>
+<br>
+<button id="postit">Post It</button>
+<script>
+document.getElementById('postit').addEventListener('click', function(){
+  var xhr = new XMLHttpRequest()
+  xhr.open('POST', location)
+  xhr.setRequestHeader('Content-Type', 'application/json')
+  xhr.onreadystatechange = function(){
+    if(xhr.readyState == 4){
+      document.open()
+      document.write(xhr.responseText)
+      document.close()
+    }
+  }
+  xhr.send(document.getElementById('data').value)
+})
+</script>
+{% endif %}
+</body>
