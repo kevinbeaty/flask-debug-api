@@ -54,11 +54,6 @@ class BrowseAPIPanel(DebugPanel):
         })
 
     def url_builder(self, route):
-        #form_name = '_debug-api-endpoint%s' % route.endpoint
-        #document.forms['_debug_api_api_notebooks.get']['notebook_id'].value
-        #content = '<form name="_debug_api_%s">' % route.endpoint
-        #rule = route.rule
-        #url = url_for('debug-api.browse', path=rule[1:])
         parts = []
         for (converter, arguments, variable) in parse_rule(route.rule):
             parts.append({'variable': converter is not None, 'text': variable})
