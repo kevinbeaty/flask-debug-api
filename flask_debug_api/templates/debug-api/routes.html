@@ -4,19 +4,15 @@
       <th>URL route</th>
       <th>Endpoint name</th>
       <th>HTTP methods</th>
-      <th>Is alias</th>
-      <th>Redirect to</th>
     </tr>
   </thead>
   <tbody>
     {% if routes %}
       {% for route in routes|sort(attribute='rule') %}
         <tr>
-          <td><a href="{{ url_for('debug-api.browse', path=route.rule[1:]) }}">{{ route.rule }}</a></td>
+          <td>{{ variables[route.rule] }}</td>
           <td>{{ route.endpoint }}</td>
           <td>{{ route.methods|sort|join(', ') }}</td>
-          <td>{{ route.alias }}</td>
-          <td>{{ route.redirect_to }}</td>
         </tr>
       {% endfor %}
     {% else %}

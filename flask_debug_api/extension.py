@@ -1,8 +1,8 @@
 import json
 
 from flask import (
-    Blueprint, current_app, render_template,
-    request, after_this_request, make_response,
+    Blueprint, current_app, render_template, url_for,
+    request, after_this_request, make_response, redirect,
     _request_ctx_stack, Markup)
 
 try:
@@ -29,8 +29,8 @@ class DebugAPIExtension(object):
         app.register_blueprint(module, url_prefix='/_debug-api')
 
 
-@module.route('/', defaults={'path': '/'}, methods=['GET', 'POST'])
-@module.route('/<path:path>', methods=['GET', 'POST'])
+@module.route('/browse', defaults={'path': '/'}, methods=['GET', 'POST'])
+@module.route('/browse/<path:path>', methods=['GET', 'POST'])
 def browse(path):
     adapter = _request_ctx_stack.top.url_adapter
     if adapter.test(path, request.method):
@@ -42,7 +42,13 @@ def browse(path):
         return render_template(TEMPLATE, post=True)
     return render_template(
         TEMPLATE,
-        data='No match for path: /%s\n\n%s' % (path, current_app.url_map))
+        data='No match for path: /%s' % path)
+
+
+@module.route('/route/<api_endpoint>')
+def route(api_endpoint):
+    path = url_for(api_endpoint, **request.args.to_dict())
+    return redirect(url_for('debug-api.browse', path=path[1:]))
 
 
 def modify_response(response):

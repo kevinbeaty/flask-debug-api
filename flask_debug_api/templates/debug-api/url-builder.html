@@ -1,0 +1,10 @@
+<form action="{{ url_for('debug-api.route', api_endpoint=route.endpoint) }}" method="get">
+<input type="submit" style="border:2px solid #ccc; padding: 3px; color: #eee; background-color: #008000" value="Browse to:">
+{% for part in parts %}
+    {% if part.variable %}
+    <input type="text" placeholder="{{ part.text }}" style="border:1px solid" name="{{ part.text }}" />
+    {% else %}
+    {{ part.text }}
+    {% endif %}
+{% endfor %}
+</form>

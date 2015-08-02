@@ -1,7 +1,8 @@
 import jinja2
 
-from flask import current_app, url_for
+from flask import current_app, url_for, Markup
 from flask_debugtoolbar.panels import DebugPanel
+from werkzeug.routing import parse_rule
 
 template_loader = jinja2.PrefixLoader({
     'debug-api': jinja2.PackageLoader(__name__, 'templates/debug-api')
@@ -23,6 +24,7 @@ class BrowseAPIPanel(DebugPanel):
         DebugPanel.__init__(self, jinja_env, context=context)
         self.jinja_env.loader = jinja2.ChoiceLoader([
             self.jinja_env.loader, template_loader])
+        self.variables = {}
 
     def nav_title(self):
         return 'API Browse'
@@ -40,10 +42,30 @@ class BrowseAPIPanel(DebugPanel):
     def process_request(self, request):
         rs = current_app.url_map.iter_rules()
         self.routes = [r for r in rs if r.rule.startswith(_prefix())]
+        for r in self.routes:
+            self.variables[r.rule] = self.url_builder(r)
 
     def content(self):
         return self.render('debug-api/routes.html', {
             'routes': self.routes,
             'prefix': _prefix(),
+            'url_for': url_for,
+            'variables': self.variables
+        })
+
+    def url_builder(self, route):
+        #form_name = '_debug-api-endpoint%s' % route.endpoint
+        #document.forms['_debug_api_api_notebooks.get']['notebook_id'].value
+        #content = '<form name="_debug_api_%s">' % route.endpoint
+        #rule = route.rule
+        #url = url_for('debug-api.browse', path=rule[1:])
+        parts = []
+        for (converter, arguments, variable) in parse_rule(route.rule):
+            parts.append({'variable': converter is not None, 'text': variable})
+
+        content = self.render('debug-api/url-builder.html', {
+            'route': route,
+            'parts': parts,
             'url_for': url_for
         })
+        return Markup(content)
