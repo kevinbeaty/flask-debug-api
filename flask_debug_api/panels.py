@@ -12,7 +12,7 @@ def _prefix():
     return current_app.config.get('DEBUG_API_PREFIX', '')
 
 
-class DebugAPIPanel(DebugPanel):
+class BrowseAPIPanel(DebugPanel):
     """
     Panel that displays the API browser
     """
