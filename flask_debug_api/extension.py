@@ -1,7 +1,7 @@
 import json
 
 from flask import (
-    Blueprint, current_app, render_template, url_for,
+    Blueprint, current_app, render_template, url_for, g,
     request, after_this_request, make_response, redirect,
     _request_ctx_stack, Markup)
 
@@ -17,6 +17,7 @@ except ImportError:
 
 module = Blueprint('debug-api', __name__, template_folder='templates')
 TEMPLATE = 'debug-api/content.html'
+METHODS = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE']
 
 
 class DebugAPIExtension(object):
@@ -29,33 +30,30 @@ class DebugAPIExtension(object):
         app.register_blueprint(module, url_prefix='/_debug-api')
 
 
-@module.route('/browse', defaults={'path': '/'}, methods=['GET', 'POST'])
-@module.route('/browse/<path:path>', methods=['GET', 'POST'])
-def browse(path):
-    adapter = _request_ctx_stack.top.url_adapter
-    if adapter.test(path, request.method):
-        after_this_request(modify_response)
-        (endpoint, kwargs) = adapter.match(path)
-        view_func = current_app.view_functions[endpoint]
-        return view_func(**kwargs)
-    elif adapter.test(path, 'POST'):
-        return render_template(TEMPLATE, post=True)
-    return render_template(
-        TEMPLATE,
-        data='No match for path: /%s' % path)
-
-
 @module.route('/route/<api_endpoint>')
 def route(api_endpoint):
     path = url_for(api_endpoint, **request.args.to_dict())
     return redirect(url_for('debug-api.browse', path=path[1:]))
 
 
+@module.route('/browse', defaults={'path': '/'}, methods=METHODS)
+@module.route('/browse/<path:path>', methods=METHODS)
+def browse(path):
+    adapter = _request_ctx_stack.top.url_adapter
+    g.methods = [method for method in METHODS if adapter.test(path, method)]
+    if adapter.test(path, request.method):
+        after_this_request(modify_response)
+        (endpoint, kwargs) = adapter.match(path)
+        view_func = current_app.view_functions[endpoint]
+        return view_func(**kwargs)
+    return render_template(TEMPLATE, methods=g.methods)
+
+
 def modify_response(response):
     if response.mimetype == 'application/json':
         data = format_json(response.get_data())
-        post = request.method == 'POST'
-        rendered = render_template(TEMPLATE, data=data, post=post)
+        rendered = render_template(
+            TEMPLATE, data=data, methods=g.methods)
         return make_response(rendered)
     return response
 
@@ -67,7 +65,7 @@ def format_json(data):
     data = json.dumps(json.loads(data), indent=2, sort_keys=True)
 
     if not HAVE_PYGMENTS:
-        return Markup('<pre>%s></pre>' % data)
+        return Markup('<pre>%s</pre>' % data)
 
     return Markup(highlight(
         data,
