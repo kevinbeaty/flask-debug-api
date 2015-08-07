@@ -1,12 +1,11 @@
 Flask Debug API
 ===============
 
-.. image:: http://simplectic.com/static/resources/flask-debug-api/flask-debug-todo.gif
-
 Flask-Debug-API is an API Browser for Flask-DebugToolbar.
 
 Injects a form to POST, PUT, PATCH or DELETE to API endpoints and allows debugging SQLAlchemy queries, Werkzeug stack traces, and everything else that Flask-DebugToolbar supports.
 
+.. image:: http://simplectic.com/static/resources/flask-debug-api/flask-debug-todo.gif
 
 Installation
 ------------
