@@ -6,7 +6,7 @@ with open(os.path.join(os.path.dirname(__file__), 'README.rst')) as README:
 
 setup(
     name='Flask-Debug-API',
-    version='0.0.4-pre',
+    version='0.1.0',
     url='http://github.com/kevinbeaty/flask-debug-api',
     license='MIT',
     author='Kevin Beaty',
@@ -19,7 +19,7 @@ setup(
     platforms='any',
     install_requires=['Flask-DebugToolbar'],
     classifiers=[
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 4 - Beta',
         'Environment :: Web Environment',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
