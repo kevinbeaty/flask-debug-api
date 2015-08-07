@@ -9,8 +9,11 @@ Injects a form to POST, PUT, PATCH or DELETE to API endpoints and allows debuggi
 Installation
 ------------
 
-Install with pip::
-    pip install Flask-Debug-API
+Install with pip
+
+.. code-block:: sh
+
+    $ pip install Flask-Debug-API
 
 
 Usage
